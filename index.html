@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body{
+            margin:0;
+            padding: 0%;
+            text-align: center;
+            background-color: rgb(89, 130, 116);
+        }
+        ul{
+            list-style: none;
+            width: 500px;
+            margin: auto;
+        }
+        li{
+            border:2px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin:20px;
+            border-radius:5px;
+            background-color: rgb(156, 180, 180);
+        }
+        .funcBx{
+            display: flex;
+            justify-content: space-around;
+
+        }
+        .task-item.completed {
+      text-decoration: line-through;
+      opacity: 0.7;
+      background-color: aquamarine;
+    }
+        
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Todo App</h1>
+        <div>
+            <input type="text" id="input">
+            <button onclick="add()">Add</button>
+        </div>
+        <ul id="tasklist"></ul>
+    </div>
+    <script>
+        
+        let tasks = JSON.parse(localStorage.getItem('tasks'))  || [];
+        document.body.addEventListener('DOMContentLoaded',loadtask())
+        console.log(tasks)
+
+       function add(){
+        const time = new Date();
+        const day = time.getDay();
+
+        console.log(time)
+        const input = document.getElementById('input').value;
+        const text  = input.trim();
+        tasks.push({time,text,completed:false})
+        console.log(tasks)
+        saveTask();
+        loadtask();
+       }
+
+       function saveTask(){
+        localStorage.setItem('tasks',JSON.stringify(tasks));
+       }
+       
+       function loadtask(){
+        const ul = document.getElementById('tasklist');
+        ul.innerHTML = '';
+        tasks.forEach((task,index) => {
+             const li = document.createElement('li');
+            li.className = "task-item"+(task.completed ? ' completed' : '')+(document.body.classList.contains('dark-mode') ? 'dark-mode':'');
+            li.innerHTML =`
+            <span>${task.text}</span>
+            <div class="funcBx">
+                <p>${task.time}</p>
+                <button onclick="editTask(${index})">edit</button>
+                <button onclick="removeTask(${index})">Delete</button>
+                <button onclick="comp(${index})">${(task.completed ? 'Undo' : 'complete')}</button>
+                <div>        
+            `
+            ul.appendChild(li);
+            
+        });
+       }
+       function removeTask(index){
+        tasks = tasks.filter((_,i) => i !== index); // ✅ Correctly removes the task
+              saveTask();
+              loadtask();
+       }
+
+     function editTask(index){
+        const tochange = prompt("enter",tasks[index].text);
+        tasks[index].text = tochange.trim();
+        saveTask();
+        loadtask();
+     }
+     function comp(index){
+        tasks[index].completed = !tasks[index].completed;
+        saveTask();
+        loadtask();
+     }
+    </script>
+</body>
+</html>
